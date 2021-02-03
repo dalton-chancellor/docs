@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>evpy Functions &#8212; evpy 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="evpy documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-evpy">
+<span id="evpy-functions"></span><h1>evpy Functions<a class="headerlink" href="#module-evpy" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="evpy.batt_pred">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">batt_pred</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">I_load</span></em>, <em class="sig-param"><span class="n">t_hr</span></em>, <em class="sig-param"><span class="n">Q_Ah</span></em>, <em class="sig-param"><span class="n">R_int</span></em>, <em class="sig-param"><span class="n">n_ser</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n_prll</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pkrt</span><span class="o">=</span><span class="default_value">1.2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.batt_pred" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict voltage at a given time under a given load</p>
+<p>predict the entire pack’s instantaneous terminal voltage under load
+uses empirical state-of-charge curve fit obtained from Chen and Mora
+<a class="reference external" href="https://doi.org/10.1109/TEC.2006.874229">https://doi.org/10.1109/TEC.2006.874229</a></p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>I_load<span class="classifier">float, Amps</span></dt><dd><p>the current draw at the battery terminals</p>
+</dd>
+<dt>t<span class="classifier">float, hours</span></dt><dd><p>the instant in time</p>
+</dd>
+<dt>Q_Ah<span class="classifier">float, Amp*hr</span></dt><dd><p>the rated capacity of the battery unit</p>
+</dd>
+<dt>R_int<span class="classifier">float, Ohms</span></dt><dd><p>the internal resistance of the battery unit
+in the tens of mili-Ohms range</p>
+</dd>
+<dt>n_ser<span class="classifier">int, non-dim (optional)</span></dt><dd><p>the number of battery units in series</p>
+</dd>
+<dt>n_prll<span class="classifier">int, non-dim (optional)</span></dt><dd><p>the number of battery units in parallel</p>
+</dd>
+<dt>pkrt<span class="classifier">float, non-dim (optional)</span></dt><dd><p>the Peukert constant of the battery</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>V_term<span class="classifier">float, Volts</span></dt><dd><p>the output voltage of the battery</p>
+</dd>
+<dt>dod<span class="classifier">float, non-dim</span></dt><dd><p>the depth of discharge of the battery (percent depleted)</p>
+</dd>
+<dt>soc<span class="classifier">float, non-dim</span></dt><dd><p>the state of charge of the battery (percent remaining)</p>
+</dd>
+</dl>
+<p>SPECIAL NOTES:</p>
+<p>1.—  
+The applied current (I_load) and the time (t) can be vectors (ndarrays)
+to calculate the entire discharge curve of the battery. However, 
+BOTH inputs must be vectors of the same length!</p>
+<p>2.—
+Ensure that the inputs have the correct units! 
+Hobby batteries are rated in mili-Amp*hr
+This code requires you to enter the capacity in Amp*hr</p>
+<p>3.— 
+Battery terminology is imprecise. A “pack” and “module” may mean
+different things to different people.</p>
+<p>For example, the Thunder Power TP7700-6SR70 is a 7.7 Ah (Amp*hr) unit 
+which consists of 6 cells in series.
+To model this battery unit, input 7.7 for Q_Ah and set n_ser = 6
+If you had 4 of these units wired in series, set n_ser = 4*6
+If you had 4 of these units wired in parallel, set n_prll = 4</p>
+<p>4.—
+Normally, you should not deplete a lithium-ion battery below 3.5 V
+In extreme circumstances, you can delpete a li-ion battery down to 3.3 V 
+<em>NEVER</em> deplete a battery below 3 V</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.batt_size">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">batt_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_hr</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">2037.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.batt_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict battery mass, size for a given duration, specific energy</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>t<span class="classifier">float, hours</span></dt><dd><p>time duration of mission or mission phase</p>
+</dd>
+<dt>e<span class="classifier">float, Wh/kg</span></dt><dd><p>specific energy (energy/mass) of mission or mission phase</p>
+</dd>
+<dt>rho<span class="classifier">float, kg/m^3 (optional)</span></dt><dd><p>the mass density (mass/volume) of a lipo battery</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>m<span class="classifier">float, kg</span></dt><dd><p>mass of required battery pack</p>
+</dd>
+<dt>U<span class="classifier">float, m^3</span></dt><dd><p>volume of required battery pack</p>
+</dd>
+</dl>
+<p>SPECIAL NOTES:</p>
+<p>mass density (mass/volume) of typical lipo is ~2000 kg/m^3 or 2 g/cm^3</p>
+<dl class="simple">
+<dt>reasonable usable energy densities:</dt><dd><p>200 Wh/kg for an <em>extremely</em> well-optimized low-current application
+170 Wh/kg for a low-current (fixed-wing) application
+140 Wh/kg for a high-current (VTOL) application</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.esc_pred">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">esc_pred</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Im</span></em>, <em class="sig-param"><span class="n">Pm</span></em>, <em class="sig-param"><span class="n">V</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">f_pwm</span><span class="o">=</span><span class="default_value">8000.0</span></em>, <em class="sig-param"><span class="n">Ron</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">Ton</span><span class="o">=</span><span class="default_value">1e-06</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.esc_pred" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict ESC losses given specs and motor performance</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>Im<span class="classifier">ndarray (float), Amps</span></dt><dd><p>the current pulled by the motor</p>
+</dd>
+<dt>Pm<span class="classifier">ndarray (float), Watts</span></dt><dd><p>the power pulled by the motor</p>
+</dd>
+<dt>V<span class="classifier">float, Volts</span></dt><dd><p>the input (DC) voltage to the ESC</p>
+</dd>
+<dt>d<span class="classifier">float, non-dim</span></dt><dd><p>the non-dimensional throttle setting (duty ratio)</p>
+</dd>
+<dt>f_pwm<span class="classifier">float, Hertz</span></dt><dd><p>the switching frequency of the ESC, about 8-32 kHz</p>
+</dd>
+<dt>Ron<span class="classifier">float, Ohms</span></dt><dd><p>the R_ds_ON measure of the MOSFETs in the ESC, about 5-20 mOhms</p>
+</dd>
+<dt>Ton<span class="classifier">float, s (seconds)</span></dt><dd><p>the transition period of the MOSFETs, about 1 microsecond</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>I_dc<span class="classifier">ndarray (float), Amps</span></dt><dd><p>the current draw of the ESC</p>
+</dd>
+<dt>P_dc<span class="classifier">ndarray (float), Watts</span></dt><dd><p>the power draw of the ESC</p>
+</dd>
+<dt>n<span class="classifier">ndarray (float), non-dim</span></dt><dd><p>the efficiency of the ESC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.esc_size">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">esc_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">P_req</span></em>, <em class="sig-param"><span class="n">sf</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.esc_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict esc size, mass given cont. power</p>
+<p>predict the esc volume and mass using a purely empirical fit
+empirical data collected from 3 KDE, Castle, and HobbyWing data
+nearly uniform trends among all three datasets</p>
+<p>P = 36.203m where [P] = Watts, [m] = grams
+P = 52.280U where [P] = Watts, [U] = cm^3</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>P_req<span class="classifier">float, Watts</span></dt><dd><p>the required continuous power output of the ESC</p>
+</dd>
+<dt>sf<span class="classifier">float, non-dim (optional)</span></dt><dd><p>a safety factor for the prediction
+hobby rule of thumb is 2.0</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>m<span class="classifier">float, kg</span></dt><dd><p>the mass of the ESC</p>
+</dd>
+<dt>U<span class="classifier">float, m^3</span></dt><dd><p>the volume of the ESC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.motor_contour">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">motor_contour</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N_rated</span></em>, <em class="sig-param"><span class="n">T_rated</span></em>, <em class="sig-param"><span class="n">kt</span></em>, <em class="sig-param"><span class="n">R</span></em>, <em class="sig-param"><span class="n">I0</span></em>, <em class="sig-param"><span class="n">num_pts</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.motor_contour" title="Permalink to this definition">¶</a></dt>
+<dd><p>roughly predict the motor’s torque/speed/efficiency contour</p>
+<p>predicts motor efficiency within the motor’s rated operating window 
+uses 3 high-level component parameters (Rm, kt, I0)
+applicable to sensorless, six-step commutation brushless DC motors
+DOES NOT factor in harmonics!</p>
+<p>Note: kt = kv with SI units</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>N_rated<span class="classifier">float, rev/min</span></dt><dd><p>rated motor speed</p>
+</dd>
+<dt>T_rated<span class="classifier">float, N.m</span></dt><dd><p>rated motor torque</p>
+</dd>
+<dt>kt<span class="classifier">float, Newton-meter per Amp</span></dt><dd><p>torque constant of motor</p>
+</dd>
+<dt>Rm<span class="classifier">float, Ohms</span></dt><dd><p>motor resistance (phase to phase)</p>
+</dd>
+<dt>I0<span class="classifier">float, Amps</span></dt><dd><p>no-load current of motor</p>
+</dd>
+<dt>num_pts<span class="classifier">int, non-dim</span></dt><dd><p>number of data points along each axis</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>N<span class="classifier">2D ndarray (float), rev/min</span></dt><dd><p>a 2D array of the motor’s speed up to N_rated</p>
+</dd>
+<dt>T<span class="classifier">2D ndarray (float), Newton-meter</span></dt><dd><p>a 2D array of the motor’s torque up to T_rated</p>
+</dd>
+<dt>n<span class="classifier">2D ndarray (float), non-dim</span></dt><dd><p>a 2D array of the motor’s non-dimensional motor efficiency
+grid is over the entire torque/speed window</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.motor_pred">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">motor_pred</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">w</span></em>, <em class="sig-param"><span class="n">V</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">kt</span></em>, <em class="sig-param"><span class="n">Rm</span></em>, <em class="sig-param"><span class="n">I0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.motor_pred" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict motor performance for given specs</p>
+<p>predict torque, power, current, and efficiency over a range of speed 
+uses 3 high-level component parameters (Rm, kt, I0) and throttle
+applicable to sensorless, six-step commutation brushless DC motors</p>
+<p>Note: kt = kv with SI units</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>w<span class="classifier">ndarray (float), rads/sec</span></dt><dd><p>range of motor speed</p>
+</dd>
+<dt>V<span class="classifier">float, Volts</span></dt><dd><p>voltage of the DC bus</p>
+</dd>
+<dt>d<span class="classifier">float, non-dim</span></dt><dd><p>non-dimensional throttle setting (duty ratio)</p>
+</dd>
+<dt>Rm<span class="classifier">float, Ohms</span></dt><dd><p>motor resistance (phase to phase)</p>
+</dd>
+<dt>kt<span class="classifier">float, Newton-meter per Amp</span></dt><dd><p>torque constant of motor</p>
+</dd>
+<dt>I0<span class="classifier">float, Amps</span></dt><dd><p>no-load current of motor</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>T<span class="classifier">ndarray (float), Newton-meter</span></dt><dd><p>output torque of motor</p>
+</dd>
+<dt>P_out<span class="classifier">ndarray (float), Watts</span></dt><dd><p>output power (mechanical)</p>
+</dd>
+<dt>I<span class="classifier">ndarray (float), Amps</span></dt><dd><p>input current to motor</p>
+</dd>
+<dt>P_in<span class="classifier">ndarray (float), Watts</span></dt><dd><p>input power (AC)</p>
+</dd>
+<dt>n<span class="classifier">ndarray (float), non-dim</span></dt><dd><p>non-dimensional motor efficiency</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="evpy.motor_size">
+<code class="sig-prename descclassname">evpy.</code><code class="sig-name descname">motor_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">shear</span><span class="o">=</span><span class="default_value">5500.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#evpy.motor_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size a motor for a given torque, aspect ratio</p>
+<p>Predict mass, diameter, length, figure of merit for given torque, D/L
+Default shear stress is for sub-500 gram BLDC motors</p>
+<p>INPUTS:</p>
+<dl class="simple">
+<dt>T<span class="classifier">float, N.m</span></dt><dd><p>continuous torque required of motor</p>
+</dd>
+<dt>x<span class="classifier">float, non-dim</span></dt><dd><p>stator aspect ratio (D/L)</p>
+</dd>
+<dt>shear<span class="classifier">float, Pa (N/m^2) - OPTIONAL</span></dt><dd><p>shear stress used to size the initial volume
+default value of 5.5 kPa is a conservative est.</p>
+</dd>
+</dl>
+<p>OUTPUTS:</p>
+<dl class="simple">
+<dt>m_tot<span class="classifier">float, kg</span></dt><dd><p>total mass of the motor</p>
+</dd>
+<dt>U_tot<span class="classifier">float, m^3</span></dt><dd><p>total volume of the motor</p>
+</dd>
+<dt>Do<span class="classifier">float, m</span></dt><dd><p>outer motor diameter</p>
+</dd>
+<dt>Lo<span class="classifier">float, m</span></dt><dd><p>outer motor length</p>
+</dd>
+<dt>km<span class="classifier">float, N.m/sqrt(Ohms)</span></dt><dd><p>figure of merit (motor constant) of the motor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">evpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">evpy Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">evpy documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Dalton Chancellor.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/autodoc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
